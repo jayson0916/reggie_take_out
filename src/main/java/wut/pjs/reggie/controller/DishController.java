@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import wut.pjs.reggie.common.R;
 import wut.pjs.reggie.dto.DishDto;
@@ -17,7 +16,6 @@ import wut.pjs.reggie.service.DishFlavorService;
 import wut.pjs.reggie.service.DishService;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -40,8 +38,6 @@ public class DishController {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private RedisTemplate redisTemplate;
     /*
     * 新增菜品以及口味
     * */
@@ -175,15 +171,6 @@ public class DishController {
 
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish){
-
-        List<DishDto> dishDtoList = null;
-        String key = "dish_"+dish.getCategoryId()+"_"+dish.getStatus(); //dish_id_status
-        //先从redis中获取缓存数据
-        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
-        //如果存在，直接返回，无需查询数据库
-        if (dishDtoList != null) {
-            return R.success(dishDtoList);
-        }
         //构造查询条件
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
@@ -194,7 +181,7 @@ public class DishController {
 
         List<Dish> list = dishService.list(queryWrapper);
 
-        dishDtoList = list.stream().map((item)->{
+        List<DishDto> dishDtoList = list.stream().map((item)->{
             //构造 一个 DishDto的对象
             DishDto dishDto = new DishDto();
             //将item遍历到的属性值，拷贝到dishDto对象中
@@ -218,8 +205,7 @@ public class DishController {
             //返回dishDto对象
             return dishDto;
         }).collect(Collectors.toList());
-        //如果不存在，需要查询数据库，将查询到的菜品数据缓存到redis中 设置缓存时间60min
-        redisTemplate.opsForValue().set(key,dishDtoList,60, TimeUnit.MINUTES);
+
         return R.success(dishDtoList);
     }
 }
