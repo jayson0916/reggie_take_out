@@ -12,6 +12,10 @@ public class JedisTest {
         Jedis jedis = new Jedis("localhost", 6379);
         //执行操作
         jedis.set("username","xiaoming");
+        String username = jedis.get("username");
+        System.out.println(username);
+
+        jedis.del("username");
         //关闭连接
         jedis.close();
     }
