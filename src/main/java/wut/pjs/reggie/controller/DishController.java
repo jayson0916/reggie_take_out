@@ -175,7 +175,6 @@ public class DishController {
 
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish){
-
         List<DishDto> dishDtoList = null;
         String key = "dish_"+dish.getCategoryId()+"_"+dish.getStatus(); //dish_id_status
         //先从redis中获取缓存数据
