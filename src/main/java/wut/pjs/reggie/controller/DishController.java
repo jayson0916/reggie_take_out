@@ -18,6 +18,7 @@ import wut.pjs.reggie.service.DishService;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -127,9 +128,11 @@ public class DishController {
         log.info(dishDto.toString());
 
         //涉及两张表 菜品和口味表
-
         dishService.updateWithFlavor(dishDto);
 
+        //清理分类菜品的缓存数据
+        String key = "dish_"+dishDto.getCategoryId()+"_1";
+        redisTemplate.delete(key);
         return R.success("修改菜品信息成功");
     }
 
@@ -137,12 +140,16 @@ public class DishController {
     //停售起售菜品
     @PostMapping("/status/{status}")
     public R<String> sale(@PathVariable int status, String[] ids){
+
         //forEach 实现批量操作
         for(String id: ids){
             Dish dish = dishService.getById(id);
             dish.setStatus(status);
             dishService.updateById(dish);
         }
+        //删除所有缓存
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
         return R.success("修改成功");
     }
 

@@ -120,6 +120,8 @@ public class ShoppingCartController  {
         else {
             shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId());
         }
+
+
         ShoppingCart cartServiceOne = shoppingCartService.getOne(shoppingCartLambdaQueryWrapper);
 
         Integer Number = cartServiceOne.getNumber();
