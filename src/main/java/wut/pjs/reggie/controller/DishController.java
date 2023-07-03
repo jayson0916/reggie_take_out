@@ -150,6 +150,7 @@ public class DishController {
         //删除所有缓存
         Set keys = redisTemplate.keys("dish_*");
         redisTemplate.delete(keys);
+
         return R.success("修改成功");
     }
 
