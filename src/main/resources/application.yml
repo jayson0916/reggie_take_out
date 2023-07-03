@@ -9,7 +9,10 @@ spring:
     port: 6379
 #    password: pjs423342
     database: 0 #默认有16个数据库 使用0号数据库
-#    jedis:
+  cache:
+    redis:
+      time-to-live: 3600000 #设置缓存过期时间
+  #    jedis:
 ##      redis 连接池配置
 #      pool:
 #        max-active: 8 #最大连接数

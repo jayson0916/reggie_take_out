@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import wut.pjs.reggie.common.R;
 import wut.pjs.reggie.dto.DishDto;
@@ -42,6 +44,8 @@ public class SetMealController {
     private CategoryService categoryService;
 
     @PostMapping
+    @CacheEvict(value = "setMealCache" , allEntries = true)
+    //allEntries = true清理value = "setMealCache"下的所有缓存数据 该属性
     public R<String> save(@RequestBody SetmealDto setmealDto){
         log.info("套餐信息：{}",setmealDto);
         setMealService.saveWithDish(setmealDto);
@@ -137,6 +141,8 @@ public class SetMealController {
     }
 
     @DeleteMapping
+    @CacheEvict(value = "setMealCache" , allEntries = true)
+    //allEntries = true清理value = "setMealCache"下的所有缓存数据 该属性
     public R<String> delete(@RequestParam List<Long> ids){
         log.info("ids:{}",ids);
 
@@ -148,6 +154,7 @@ public class SetMealController {
     /*
     * 根据条件查询套餐数据*/
     @GetMapping("/list")
+    @Cacheable(value = "setMealCache" , key="#setmeal.categoryId+'_'+#setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal) {
         log.info("setmeal:{}", setmeal);
         //条件构造器
