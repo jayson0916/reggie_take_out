@@ -1,6 +1,39 @@
 server:
   port: 8080
 spring:
+  shardingsphere:
+    datasource:
+      names:
+        master,slave
+      #主数据源
+      master:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.1.143:3306/reggie?characterEncoding=utf-8&useSSL=false
+        username: root
+        password: root
+      #从数据源
+      slave:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/reggie?characterEncoding=utf-8&useSSL=false
+        username: root
+        password: 123456
+    masterslave:
+      #读写分离配置
+      load-balance-algorithm-type: round_robin #轮询
+      #最终的数据源名称
+      name: dataSource
+      #主库数据源名称
+      master-data-source-name: master
+      # 从库数据源名称列表，多个逗号分隔
+      slave-data-source-names: slave
+    props:
+      sql:
+        show: true #开启SQL显示，默认false
+
+  main:
+    allow-bean-definition-overriding: true #允许bean定义覆盖
   application:
     #应用名称
     name: reggie_take_out
@@ -16,13 +49,12 @@ spring:
 #        max-wait: 1ms #连接池最大阻塞等待时间
 #        max-idle: 4 #连接池中的最大空闲连接
 #        min-idle: 0 #连接池中的最小空间连接
-  datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: root
-      password: 123456
-
+#  datasource:
+#    druid:
+#      driver-class-name: com.mysql.cj.jdbc.Driver
+#      url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+#      username: root
+#      password: 123456
 mybatis-plus:
   configuration:
     #address_book->AddressBook
@@ -34,4 +66,6 @@ mybatis-plus:
       id-type: ASSIGN_ID
 reggie:
   path: D:\AProjectData\reggieData\img\
+
+
 
